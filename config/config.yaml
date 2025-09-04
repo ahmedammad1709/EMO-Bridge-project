@@ -1,0 +1,7 @@
+enable_mqtt: true
+gemini_api_key: AIzaSyAziheBOPBIaHleqGZV83mBk6zC7Jc6wXY
+mqtt_broker: localhost
+mqtt_port: 1883
+mqtt_topic: emo/bridge
+voice_rate: 180
+voice_volume: 1.0

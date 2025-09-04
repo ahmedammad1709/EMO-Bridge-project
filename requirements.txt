@@ -1,0 +1,14 @@
+# EMO Bridge Requirements
+
+# Core dependencies
+google-generativeai>=0.3.0
+SpeechRecognition>=3.10.0
+pyttsx3>=2.90
+ttkbootstrap>=1.10.0
+pyyaml>=6.0
+
+# Optional dependencies
+paho-mqtt>=2.0.0  # For MQTT smart home integration
+
+# Development dependencies
+pyinstaller>=5.6.0  # For building macOS app
