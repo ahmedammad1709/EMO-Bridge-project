@@ -34,12 +34,7 @@ class EMOBridgeBackend:
         self.running = False
         self.thread = None
         self.recognizer = sr.Recognizer()
-        self.engine = pyttsx3.init()
         self.mqtt_client = None
-        
-        # Configure voice properties
-        self.engine.setProperty('rate', config.get('voice_rate', 180))
-        self.engine.setProperty('volume', config.get('voice_volume', 1.0))
         
         # Configure Gemini API
         self._configure_gemini()
@@ -96,10 +91,6 @@ class EMOBridgeBackend:
             
         if config.get('enable_mqtt', False):
             self._configure_mqtt()
-        
-        # Update voice properties
-        self.engine.setProperty('rate', config.get('voice_rate', 180))
-        self.engine.setProperty('volume', config.get('voice_volume', 1.0))
     
     def set_persona(self, persona):
         """
@@ -151,8 +142,24 @@ class EMOBridgeBackend:
             self.thread = None
         
         # Say goodbye
-        self.engine.say("Goodbye!")
-        self.engine.runAndWait()
+        self._speak("Goodbye!")
+    
+    def _speak(self, text):
+        """
+        Speak text using pyttsx3 (fresh engine each time to avoid silent failures)
+        """
+        try:
+            print("Starting TTS playback...")
+            engine = pyttsx3.init()
+            engine.setProperty('rate', self.config.get('voice_rate', 180))
+            engine.setProperty('volume', self.config.get('voice_volume', 1.0))
+            engine.say(text)
+            engine.runAndWait()
+            engine.stop()
+            del engine
+            print("Finished TTS playback.")
+        except Exception as e:
+            print(f"TTS Error: {e}")
     
     def _voice_loop(self):
         """
@@ -223,8 +230,7 @@ class EMOBridgeBackend:
                     self.status_callback("Speaking")
                 
                 # Speak the response
-                self.engine.say(reply)
-                self.engine.runAndWait()
+                self._speak(reply)
                 
                 # Publish to MQTT if enabled
                 if self.mqtt_client:
@@ -234,7 +240,7 @@ class EMOBridgeBackend:
                 # Short pause between interactions
                 time.sleep(0.5)
                 
-                # Update status back to Listening
+                # Only update status back to Listening after playback is confirmed finished
                 if self.status_callback:
                     self.status_callback("Listening")
                     
