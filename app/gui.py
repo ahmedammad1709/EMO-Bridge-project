@@ -330,7 +330,7 @@ class EMOBridgeApp:
             self.status_indicator.configure(bootstyle="info")
         elif status == "Interrupted":
             self.status_indicator.configure(bootstyle="warning")
-        elif status == "Error":
+        elif status == "Error" or status.startswith("Error:"):
             self.status_indicator.configure(bootstyle="danger")
     
     # Method removed as API key entry is no longer in the UI
