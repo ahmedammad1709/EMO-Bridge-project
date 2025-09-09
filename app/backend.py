@@ -88,8 +88,10 @@ class EMOBridgeBackend:
                 60
             )
             self.mqtt_client.loop_start()
+            print("MQTT connected successfully")
         except Exception as e:
             print(f"MQTT Error: {e}")
+            print("MQTT connection failed - continuing without MQTT support")
             self.mqtt_client = None
 
     def update_config(self, config):

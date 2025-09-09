@@ -1,4 +1,4 @@
-enable_mqtt: true
+enable_mqtt: false
 gemini_api_key: AIzaSyAziheBOPBIaHleqGZV83mBk6zC7Jc6wXY
 mqtt_broker: localhost
 mqtt_port: 1883
