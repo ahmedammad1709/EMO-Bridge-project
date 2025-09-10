@@ -1,5 +1,7 @@
 enable_mqtt: false
-gemini_api_key: AIzaSyAziheBOPBIaHleqGZV83mBk6zC7Jc6wXY
+gemini_api_key: AIzaSyA0YXdDC2lEHnxP9clDY32OdhahlyYHxDA
+language: pt
+language_mode: pt-PT
 mqtt_broker: localhost
 mqtt_port: 1883
 mqtt_topic: emo/bridge

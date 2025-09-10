@@ -26,6 +26,7 @@ def load_config():
     # Default configuration
     default_config = {
         'gemini_api_key': '',
+        'language': 'pt',  # Default language (Portuguese)
         'enable_mqtt': False,
         'mqtt_broker': 'localhost',
         'mqtt_port': 1883,

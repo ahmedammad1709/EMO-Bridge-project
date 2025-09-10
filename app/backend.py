@@ -25,18 +25,41 @@ def speak(text, rate=180, volume=1.0):
     - On macOS: uses the 'say' command.
     - On Linux: uses 'espeak'.
     - On Windows: uses pyttsx3.
+    
+    Automatically strips emojis from text before sending to TTS.
     """
     try:
+        # Strip emojis from text using regex
+        import re
+        # Pattern to match emoji characters
+        emoji_pattern = re.compile(
+            "["
+            "\U0001F600-\U0001F64F"  # emoticons
+            "\U0001F300-\U0001F5FF"  # symbols & pictographs
+            "\U0001F680-\U0001F6FF"  # transport & map symbols
+            "\U0001F700-\U0001F77F"  # alchemical symbols
+            "\U0001F780-\U0001F7FF"  # Geometric Shapes
+            "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+            "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+            "\U0001FA00-\U0001FA6F"  # Chess Symbols
+            "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+            "\U00002702-\U000027B0"  # Dingbats
+            "\U000024C2-\U0001F251" 
+            "]", flags=re.UNICODE)
+        
+        # Remove emojis from text
+        clean_text = emoji_pattern.sub(r'', text)
+        
         system = platform.system()
         if system == "Darwin":  # macOS
-            subprocess.run(["say", text])
+            subprocess.run(["say", clean_text])
         elif system == "Linux":  # Linux
-            subprocess.run(["espeak", text])
+            subprocess.run(["espeak", clean_text])
         else:  # Windows
             engine = pyttsx3.init()
             engine.setProperty("rate", rate)
             engine.setProperty("volume", volume)
-            engine.say(text)
+            engine.say(clean_text)
             engine.runAndWait()
             engine.stop()
             del engine
@@ -52,6 +75,7 @@ class EMOBridgeBackend:
         self.config = config
         self.status_callback = status_callback
         self.persona = persona
+        # Hardcoded to Portuguese - no longer using config language setting
         self.running = False
         self.thread = None
         self.recognizer = sr.Recognizer()
@@ -96,6 +120,7 @@ class EMOBridgeBackend:
 
     def update_config(self, config):
         self.config = config
+        # Language is now hardcoded to Portuguese - no longer using config language setting
         self._configure_gemini()
 
         if self.mqtt_client:
@@ -237,8 +262,10 @@ class EMOBridgeBackend:
                 with sr.Microphone() as source:
                     print("Listening...")
                     audio = self.recognizer.listen(source)
-
-                text = self.recognizer.recognize_google(audio).lower().strip()
+                
+                # Use the language mode from config
+                language_mode = self.config.get('language_mode', 'en-US')
+                text = self.recognizer.recognize_google(audio, language=language_mode).lower().strip()
                 print(f"User said: {text}")
 
                 # Handle quit commands
@@ -263,13 +290,23 @@ class EMOBridgeBackend:
                     continue
 
                 instruction = self.get_persona_instruction()
-                prompt = f"""
-                You are {self.persona}. {instruction}
-                If the user is asking to quit/exit/end/stop, 
-                no matter how they phrase it, reply ONLY with the word QUIT.
-                Otherwise, reply in your normal persona style.
-
-                User said: "{text}"
+                language_mode = "pt-PT"  # Hardcoded to Portuguese
+                
+                # Add emoji instruction for EMO persona
+                emoji_instruction = "Include emojis in your responses." if self.persona == "EMO" else ""
+                
+                # Hardcoded to Portuguese - no language selection
+                language_instruction = "Always reply in Portuguese (Portugal), natural conversational style. Ignore the language the user speaks in and ALWAYS respond in Portuguese (Portugal)."
+                
+                prompt = f""" 
+                You are {self.persona}. {instruction} 
+                
+                IMPORTANT: {language_instruction}
+                {emoji_instruction}
+                
+                If the user asks to quit/exit/end/stop (in any language), reply ONLY with the word QUIT. 
+                
+                User said: "{text}" 
                 """
 
                 try:

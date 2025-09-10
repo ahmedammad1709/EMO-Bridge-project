@@ -35,6 +35,7 @@ class EMOBridgeApp:
         self.persona_var = None
         self.api_key_var = None
         self.mqtt_var = None
+        # Language is now hardcoded to Portuguese
         
     def run(self):
         """
@@ -210,6 +211,8 @@ class EMOBridgeApp:
         # API Key is now loaded from config.yaml only
         self.api_key_var = tk.StringVar(value=self.config.get('gemini_api_key', ''))
         
+        # Language information block removed
+        
         # Enhanced MQTT integration section
         mqtt_frame = ttk.LabelFrame(settings_frame, text="Smart Home Integration", padding=10)
         mqtt_frame.pack(fill=tk.X, pady=10)
@@ -333,14 +336,14 @@ class EMOBridgeApp:
         elif status == "Error" or status.startswith("Error:"):
             self.status_indicator.configure(bootstyle="danger")
     
-    # Method removed as API key entry is no longer in the UI
-    
     def save_settings(self):
         """
         Save the current settings to the config file
         """
         # Update config with current values
         self.config['enable_mqtt'] = self.mqtt_var.get()
+        # Language is now hardcoded to Portuguese
+        self.config['language'] = 'pt'
         
         # Save to file
         config_path = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) / 'config' / 'config.yaml'
