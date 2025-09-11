@@ -127,7 +127,7 @@ class EMOBridgeApp:
         persona_combo = ttk.Combobox(
             persona_frame, 
             textvariable=self.persona_var,
-            values=["EMO", "EMUSINIO"],
+            values=["EMO", "Sophia"],
             state="readonly",
             bootstyle="primary"
         )
@@ -145,7 +145,7 @@ class EMOBridgeApp:
         
         emusinio_desc = ttk.Label(
             persona_frame, 
-            text="EMUSINIO: Wise, mentor-like formal tone",
+            text="Sophia: Wise, mentor-like formal tone",
             font=("Helvetica", 9),
             bootstyle="secondary"
         )

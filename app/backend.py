@@ -239,7 +239,53 @@ class EMOBridgeBackend:
     def _tts_thread_func(self, text):
         try:
             print("Starting TTS playback...")
-            speak(text, self.config.get('voice_rate', 180), self.config.get('voice_volume', 1.0))
+            
+            # Select voice based on persona
+            system = platform.system()
+            if system == "Darwin":  # macOS
+                # Use specific voices for each persona
+                if self.persona == "EMO":
+                    voice = "Catarina"
+                elif self.persona == "EMUSINIO":
+                    voice = "Joana"
+                else:
+                    voice = "Catarina"  # Default to Catarina
+                
+                # Strip emojis from text using regex
+                import re
+                emoji_pattern = re.compile(
+                    "["
+                    "\U0001F600-\U0001F64F"  # emoticons
+                    "\U0001F300-\U0001F5FF"  # symbols & pictographs
+                    "\U0001F680-\U0001F6FF"  # transport & map symbols
+                    "\U0001F700-\U0001F77F"  # alchemical symbols
+                    "\U0001F780-\U0001F7FF"  # Geometric Shapes
+                    "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+                    "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+                    "\U0001FA00-\U0001FA6F"  # Chess Symbols
+                    "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+                    "\U00002702-\U000027B0"  # Dingbats
+                    "\U000024C2-\U0001F251" 
+                    "]", flags=re.UNICODE)
+                
+                # Remove emojis from text
+                clean_text = emoji_pattern.sub(r'', text)
+                
+                # Use subprocess with voice selection
+                # Start the process but don't wait for it to complete
+                process = subprocess.Popen(["say", "-v", voice, clean_text])
+                
+                # Wait for the process to complete or for an interrupt
+                while process.poll() is None:
+                    if self.interrupt_event.is_set():
+                        # Kill the process if interrupted
+                        process.terminate()
+                        break
+                    time.sleep(0.1)
+            else:  # Windows or Linux
+                # Fall back to the existing speak function for non-macOS platforms
+                speak(text, self.config.get('voice_rate', 180), self.config.get('voice_volume', 1.0))
+                
             if not self.interrupt_event.is_set():
                 print("Finished TTS playback.")
             else:
