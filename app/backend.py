@@ -139,7 +139,7 @@ class EMOBridgeBackend:
                 "Speak in a playful, casual tone. "
                 "Keep replies short, friendly, sometimes with emojis or fun expressions."
             )
-        elif self.persona == "EMUSINIO":
+        elif self.persona == "Sophia":
             return (
                 "Speak in a wise, formal, and calm tone. "
                 "Use full sentences, no emojis, and sound like a mentor."
@@ -246,7 +246,7 @@ class EMOBridgeBackend:
                 # Use specific voices for each persona
                 if self.persona == "EMO":
                     voice = "Catarina"
-                elif self.persona == "EMUSINIO":
+                elif self.persona == "Sophia":
                     voice = "Joana"
                 else:
                     voice = "Catarina"  # Default to Catarina
@@ -321,16 +321,23 @@ class EMOBridgeBackend:
                         self.status_callback("Idle")
                     break
 
-                # Persona switching
-                if text.startswith("emo"):
+                # Persona switching - detect keywords anywhere in text (case insensitive)
+                old_persona = self.persona
+                
+                # Check for 'emo' keyword
+                if "emo" in text.lower():
                     self.persona = "EMO"
-                    text = text.replace("emo", "", 1).strip()
                     print("Persona switched to EMO")
-
-                elif text.startswith("emusinio"):
-                    self.persona = "EMUSINIO"
-                    text = text.replace("emusinio", "", 1).strip()
-                    print("Persona switched to EMUSINIO")
+                
+                # Check for 'sophia' or 'sofia' keyword
+                elif "sophia" in text.lower() or "sofia" in text.lower():
+                    self.persona = "Sophia"
+                    print("Persona switched to Sophia")
+                
+                # Notify frontend of persona change if it changed
+                if old_persona != self.persona and self.status_callback:
+                    # Use a special format that the GUI can detect
+                    self.status_callback(f"PERSONA_CHANGE:{self.persona}")
 
                 if not text or not self.model:
                     continue

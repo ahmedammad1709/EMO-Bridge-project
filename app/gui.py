@@ -127,7 +127,7 @@ class EMOBridgeApp:
         persona_combo = ttk.Combobox(
             persona_frame, 
             textvariable=self.persona_var,
-            values=["EMO", "Sophia"],
+            values=["EMO", "Sofia"],
             state="readonly",
             bootstyle="primary"
         )
@@ -145,7 +145,7 @@ class EMOBridgeApp:
         
         emusinio_desc = ttk.Label(
             persona_frame, 
-            text="Sophia: Wise, mentor-like formal tone",
+            text="Sofia: Wise, mentor-like formal tone",
             font=("Helvetica", 9),
             bootstyle="secondary"
         )
@@ -322,6 +322,15 @@ class EMOBridgeApp:
         Args:
             status (str): New status text
         """
+        # Check if this is a persona change notification
+        if status.startswith("PERSONA_CHANGE:"):
+            # Extract the persona name
+            new_persona = status.split(":")[1]
+            # Update the persona dropdown
+            self.persona_var.set(new_persona)
+            # Don't update the status text for persona changes
+            return
+            
         self.status_var.set(status)
         
         # Update status indicator color based on status
