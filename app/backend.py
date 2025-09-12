@@ -324,8 +324,8 @@ class EMOBridgeBackend:
                 # Persona switching - detect keywords anywhere in text (case insensitive)
                 old_persona = self.persona
                 
-                # Check for 'emo' keyword
-                if "emo" in text.lower():
+                # Check for 'emo' or 'imo' keyword (typo-tolerant)
+                if "emo" in text.lower() or "imo" in text.lower():
                     self.persona = "EMO"
                     print("Persona switched to EMO")
                 
